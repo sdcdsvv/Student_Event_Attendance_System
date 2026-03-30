@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { getEvents } from '@/lib/db/events';
 import { getStudents } from '@/lib/db/students';
 import { getAttendanceByEvent, upsertAttendance } from '@/lib/db/attendance';
+import { getCourseColor, getSemesterColor } from '@/lib/ui';
 import { Event, Student, AttendanceStatus, Course } from '@/types';
 import {
     CheckCircleIcon,
@@ -360,9 +361,13 @@ function AttendanceContent() {
                                             <td className="px-4 py-3 font-mono text-xs text-blue-900 font-semibold">{r.student.scholar_id}</td>
                                             <td className="px-4 py-3 font-medium text-gray-800">{r.student.name}</td>
                                             <td className="px-4 py-3">
-                                                <span className="stat-badge bg-blue-100 text-blue-700 text-[10px] font-bold border border-blue-200">{r.student.course}</span>
+                                                <span className={`stat-badge border ${getCourseColor(r.student.course)} text-[10px] font-bold`}>{r.student.course}</span>
                                             </td>
-                                            <td className="px-4 py-3 text-center text-gray-600 font-medium">{r.student.semester}</td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className={`px-2 py-0.5 rounded-md text-[10px] border shadow-sm ${getSemesterColor(r.student.semester)}`}>
+                                                    Sem {r.student.semester}
+                                                </span>
+                                            </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center justify-center gap-1.5">
                                                     <button

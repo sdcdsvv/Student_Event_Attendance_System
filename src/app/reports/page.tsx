@@ -5,6 +5,7 @@ import { useEffect, useState, useMemo } from 'react';
 import { getStudents } from '@/lib/db/students';
 import { getEvents } from '@/lib/db/events';
 import { getAllAttendance } from '@/lib/db/attendance';
+import { getCourseColor, getSemesterColor } from '@/lib/ui';
 import { Student, Course, AttendanceStatus } from '@/types';
 import {
     MagnifyingGlassIcon,
@@ -34,7 +35,16 @@ function ReportsContent() {
                     getAllAttendance(),
                 ]);
 
-                setStudents(stds);
+                // Custom Sorting: BCA (Sem Asc) -> BIT -> MCA
+                const COURSE_PRIORITY: Record<string, number> = { 'BCA': 0, 'BIT': 1, 'MCA': 2 };
+                const sortedStds = stds.sort((a, b) => {
+                    const pA = COURSE_PRIORITY[a.course] ?? 99;
+                    const pB = COURSE_PRIORITY[b.course] ?? 99;
+                    if (pA !== pB) return pA - pB;
+                    return (a.semester || 0) - (b.semester || 0);
+                });
+
+                setStudents(sortedStds);
                 setTotalEvents(evts.length);
 
                 const statsMap: { [id: string]: { present: number; na: number; absent: number } } = {};
@@ -207,13 +217,15 @@ function ReportsContent() {
 
             {/* Table */}
             <div className="card overflow-hidden shadow-xl border-t-0">
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
                     <table className="w-full text-sm border-separate border-spacing-0">
-                        <thead>
+                        <thead className="sticky top-0 z-10 shadow-sm">
                             <tr className="bg-blue-900 text-white">
                                 <th className="px-4 py-4 text-left font-black text-xs uppercase tracking-widest border-b border-blue-800">#</th>
                                 <th className="px-4 py-4 text-left font-black text-xs uppercase tracking-widest border-b border-blue-800">Scholar ID</th>
-                                <th className="px-4 py-4 text-left font-black text-xs uppercase tracking-widest border-b border-blue-800">Student Name</th>
+                                <th className="px-4 py-4 text-left font-black text-xs uppercase tracking-widest border-b border-blue-800">Name</th>
+                                <th className="px-4 py-4 text-left font-black text-xs uppercase tracking-widest border-b border-blue-800">Course</th>
+                                <th className="px-4 py-4 text-center font-black text-xs uppercase tracking-widest border-b border-blue-800">Sem</th>
                                 <th className="px-4 py-4 text-center font-black text-xs uppercase tracking-widest border-b border-blue-800 text-green-300">Pres.</th>
                                 <th className="px-4 py-4 text-center font-black text-xs uppercase tracking-widest border-b border-blue-800 text-red-300">Abs.</th>
                                 <th className="px-4 py-4 text-center font-black text-xs uppercase tracking-widest border-b border-blue-800 text-amber-300">NA</th>
@@ -235,9 +247,14 @@ function ReportsContent() {
                                     <tr key={s.scholar_id} className="hover:bg-blue-50/30 transition-colors">
                                         <td className="px-4 py-3.5 text-gray-400 text-[10px] font-black">{i + 1}</td>
                                         <td className="px-4 py-3.5 font-mono text-xs text-blue-900 font-bold">{s.scholar_id}</td>
+                                        <td className="px-4 py-3.5 font-bold text-gray-800 truncate max-w-[180px]">{s.name}</td>
                                         <td className="px-4 py-3.5">
-                                            <div className="font-bold text-gray-800 truncate max-w-[180px]">{s.name}</div>
-                                            <div className="text-[10px] text-gray-400 font-bold uppercase">{s.course} · Sem {s.semester}</div>
+                                            <span className={`stat-badge border ${getCourseColor(s.course)} text-[10px] font-bold`}>{s.course}</span>
+                                        </td>
+                                        <td className="px-4 py-3.5 text-center">
+                                            <span className={`px-2 py-0.5 rounded-md text-[10px] border shadow-sm ${getSemesterColor(s.semester)}`}>
+                                                Sem {s.semester}
+                                            </span>
                                         </td>
                                         <td className="px-4 py-3.5 text-center font-black text-green-600 text-base">{stats.present}</td>
                                         <td className="px-4 py-3.5 text-center font-black text-red-500 text-sm">{stats.absent}</td>

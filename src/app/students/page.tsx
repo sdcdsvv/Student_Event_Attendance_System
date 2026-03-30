@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getStudents, addStudent, updateStudent, searchStudents, deleteStudent } from '@/lib/db/students';
 import { downloadCSV, parseCSV, parseExcel, downloadExcel } from '@/lib/storage';
+import { getCourseColor, getSemesterColor } from '@/lib/ui';
 import { Student, Course, Gender } from '@/types';
 import {
     PlusIcon,
@@ -346,9 +347,13 @@ function StudentsContent() {
                                     <td className="px-4 py-3 font-medium border-b border-gray-50">{s.name}</td>
                                     <td className="px-4 py-3 text-gray-600 border-b border-gray-50">{s.gender}</td>
                                     <td className="px-4 py-3 border-b border-gray-50">
-                                        <span className="stat-badge bg-blue-100 text-blue-700">{s.course}</span>
+                                        <span className={`stat-badge border ${getCourseColor(s.course)}`}>{s.course}</span>
                                     </td>
-                                    <td className="px-4 py-3 text-center border-b border-gray-50 font-bold text-blue-600">{s.semester}</td>
+                                    <td className="px-4 py-3 text-center border-b border-gray-50 font-bold">
+                                        <span className={`px-2 py-0.5 rounded-md text-[10px] border ${getSemesterColor(s.semester)}`}>
+                                            Sem {s.semester}
+                                        </span>
+                                    </td>
                                     <td className="px-4 py-3 text-gray-600 text-[11px] border-b border-gray-50">{s.contact_number || '—'}</td>
                                     <td className="px-4 py-3 text-gray-600 text-[11px] border-b border-gray-50">{s.email || '—'}</td>
                                     <td className="px-4 py-3 text-center border-b border-gray-50">
@@ -470,7 +475,7 @@ function StudentsContent() {
 
             {showModal && (
                 <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-lg max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
                             <h3 className="font-bold text-blue-900">{editMode ? 'Edit Student' : 'Add New Student'}</h3>
                             <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
