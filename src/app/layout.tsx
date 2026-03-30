@@ -4,8 +4,11 @@ import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "CS Dept — Event Attendance | DSVV",
+  title: "Student Event Attendance System | DSVV",
   description: "Event Attendance Management System for the Department of Computer Science, DSVV",
+  icons: {
+    icon: "/dsvv-short-logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -27,9 +30,6 @@ export default function RootLayout({
                 </h1>
                 <p className="text-xs text-gray-500">Dev Sanskriti Vishwavidyalaya &mdash; Event Attendance System</p>
               </div>
-              <span className="text-xs bg-yellow-100 text-yellow-800 font-semibold px-3 py-1 rounded-full">
-                Internal Use
-              </span>
             </header>
             <main className="flex-1 p-4 md:p-6 overflow-auto">
               {children}
