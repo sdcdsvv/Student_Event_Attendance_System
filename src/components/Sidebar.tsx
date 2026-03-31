@@ -60,32 +60,64 @@ export default function Sidebar() {
                 <NavLinks />
             </aside>
 
-            {/* Mobile top bar */}
-            <div className="md:hidden flex items-center justify-between bg-blue-900 px-4 py-3 sticky top-0 z-30">
-                <img
-                    src="/dsvv-logo.png"
-                    alt="DSVV Logo"
-                    className="h-8 w-auto object-contain brightness-110"
-                />
+            {/* Mobile Navbar */}
+            <div className="md:hidden flex items-center justify-between bg-blue-900 px-4 py-3 sticky top-0 z-40 shadow-md">
+                <div className="flex items-center gap-2">
+                    <img
+                        src="/dsvv-short-logo.png"
+                        alt="DSVV Logo"
+                        className="h-8 w-auto object-contain brightness-110"
+                    />
+                    <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-white leading-none uppercase tracking-tighter">DSVV</span>
+                        <span className="text-[8px] font-bold text-blue-200 leading-none">Attendance System</span>
+                    </div>
+                </div>
                 <button
                     onClick={() => setMobileOpen(!mobileOpen)}
-                    className="text-white p-1"
+                    className="text-white p-2 hover:bg-blue-800 rounded-lg transition-colors active:scale-95"
+                    aria-label="Toggle Menu"
                 >
                     {mobileOpen ? <XMarkIcon className="w-6 h-6" /> : <Bars3Icon className="w-6 h-6" />}
                 </button>
             </div>
 
-            {/* Mobile drawer */}
-            {mobileOpen && (
-                <div className="md:hidden fixed inset-0 z-20 bg-black/40" onClick={() => setMobileOpen(false)}>
-                    <div
-                        className="w-56 bg-blue-900 min-h-full px-3 py-6 flex flex-col"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <NavLinks />
+            {/* Mobile Drawer */}
+            <div
+                className={`md:hidden fixed inset-0 z-30 transition-all duration-300 ease-in-out ${mobileOpen ? 'visible opacity-100' : 'invisible opacity-0'
+                    }`}
+            >
+                {/* Backdrop */}
+                <div
+                    className={`absolute inset-0 bg-blue-900/60 backdrop-blur-sm transition-opacity duration-300 ${mobileOpen ? 'opacity-100' : 'opacity-0'
+                        }`}
+                    onClick={() => setMobileOpen(false)}
+                />
+
+                {/* Drawer Content */}
+                <div
+                    className={`absolute left-0 top-0 h-full w-64 bg-blue-900 shadow-2xl transition-transform duration-300 ease-out p-5 flex flex-col ${mobileOpen ? 'translate-x-0' : '-translate-x-full'
+                        }`}
+                >
+                    <div className="flex items-center gap-3 mb-8 px-2">
+                        <img src="/dsvv-short-logo.png" className="h-10 w-auto" alt="Logo" />
+                        <div>
+                            <p className="text-sm font-black text-white">CS Department</p>
+                            <p className="text-[10px] text-blue-300">DSVV Haridwar</p>
+                        </div>
+                    </div>
+
+                    <div className="border-b border-blue-800 mb-6" />
+
+                    <NavLinks />
+
+                    <div className="mt-auto pt-6 border-t border-blue-800">
+                        <p className="text-[8px] text-blue-400 font-bold uppercase tracking-widest text-center">
+                            Powered by SDC
+                        </p>
                     </div>
                 </div>
-            )}
+            </div>
         </>
     );
 }

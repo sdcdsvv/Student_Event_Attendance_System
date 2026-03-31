@@ -18,6 +18,7 @@ import {
     FunnelIcon,
 } from '@heroicons/react/24/outline';
 import { Suspense } from 'react';
+import { TableRowSkeleton } from '@/components/Skeleton';
 
 const COURSES: Course[] = ['BCA', 'BIT', 'MCA'];
 const GENDERS: Gender[] = ['Male', 'Female', 'Other'];
@@ -247,21 +248,21 @@ function StudentsContent() {
                 </div>
             )}
 
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <h2 className="page-title">Student Management</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h2 className="page-title">Manage Students</h2>
                 <div className="flex flex-wrap gap-2">
-                    <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-1 bg-white">
-                        <span className="text-[10px] font-bold text-gray-400 px-2 uppercase">Templates</span>
-                        <button onClick={() => downloadTemplate('excel')} className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded hover:bg-green-100 font-medium">Excel</button>
-                        <button onClick={() => downloadTemplate('csv')} className="text-xs bg-gray-50 text-gray-700 px-2 py-1 rounded hover:bg-gray-100 font-medium">CSV</button>
+                    <div className="flex items-center gap-1 border border-gray-200 rounded-lg p-1 bg-white shadow-sm overflow-x-auto min-w-0">
+                        <span className="text-[10px] font-bold text-gray-400 px-2 uppercase shrink-0">Templates</span>
+                        <button onClick={() => downloadTemplate('excel')} className="text-xs bg-green-50 text-green-700 px-2 py-1.5 rounded hover:bg-green-100 font-bold transition-colors whitespace-nowrap">Excel</button>
+                        <button onClick={() => downloadTemplate('csv')} className="text-xs bg-gray-50 text-gray-700 px-2 py-1.5 rounded hover:bg-gray-100 font-bold transition-colors whitespace-nowrap">CSV</button>
                     </div>
-                    <label className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors cursor-pointer">
+                    <label className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-yellow-600 transition-all shadow-md cursor-pointer active:scale-95 whitespace-nowrap">
                         <ArrowUpTrayIcon className="w-4 h-4" /> Import Excel/CSV
                         <input type="file" accept=".csv,.xlsx,.xls" onChange={handleImport} className="hidden" />
                     </label>
                     <button
                         onClick={() => { setShowModal(true); setForm(emptyForm); setEditMode(false); }}
-                        className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
+                        className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-800 transition-all shadow-md active:scale-95 whitespace-nowrap"
                     >
                         <PlusIcon className="w-4 h-4" /> Add Student
                     </button>
@@ -317,7 +318,7 @@ function StudentsContent() {
 
             <div className="card overflow-hidden">
                 <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-sm border-separate border-spacing-0">
+                    <table className="w-full text-sm border-separate border-spacing-0 min-w-[1000px]">
                         <thead className="sticky top-0 z-10 shadow-sm">
                             <tr className="bg-blue-900 text-white">
                                 <th className="px-4 py-3 text-left font-semibold">#</th>
@@ -333,7 +334,9 @@ function StudentsContent() {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {loading ? (
-                                <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-400">Loading...</td></tr>
+                                Array.from({ length: 5 }).map((_, i) => (
+                                    <TableRowSkeleton key={i} cols={9} />
+                                ))
                             ) : students.length === 0 ? (
                                 <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-400">
                                     {(query || filterCourse !== 'All' || filterSemester !== 'All')

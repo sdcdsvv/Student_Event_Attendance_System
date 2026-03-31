@@ -18,6 +18,7 @@ import {
     MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { Suspense } from 'react';
+import { TableRowSkeleton } from '@/components/Skeleton';
 
 type StudentStatus = { student: Student; status: AttendanceStatus | null };
 
@@ -212,7 +213,7 @@ function AttendanceContent() {
                 <>
                     <div className="flex flex-col md:flex-row gap-3">
                         <div className="flex flex-wrap gap-2 items-center flex-1">
-                            <div className="flex-1 min-w-[200px]">
+                            <div className="w-full md:flex-1 md:min-w-[200px]">
                                 <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-2 rounded-xl border border-gray-100 shadow-sm focus-within:ring-2 focus-within:ring-blue-500/20 transition-all">
                                     <MagnifyingGlassIcon className="w-4 h-4 text-gray-400" />
                                     <input
@@ -230,23 +231,23 @@ function AttendanceContent() {
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-2 rounded-xl border border-gray-100 shadow-sm">
+                            <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-3 py-2 rounded-xl border border-gray-100 shadow-sm flex-1 sm:flex-initial">
                                 <FunnelIcon className="w-3.5 h-3.5 text-blue-600" />
                                 <select
                                     value={filterCourse}
                                     onChange={e => setFilterCourse(e.target.value)}
-                                    className="bg-transparent text-xs font-semibold outline-none text-gray-600 cursor-pointer"
+                                    className="bg-transparent text-xs font-semibold outline-none text-gray-600 cursor-pointer w-full"
                                 >
                                     <option value="All">All Courses</option>
                                     {COURSES.map(c => <option key={c} value={c}>{c}</option>)}
                                 </select>
                             </div>
 
-                            <div className="flex items-center bg-white/60 backdrop-blur-md px-3 py-2 rounded-xl border border-gray-100 shadow-sm">
+                            <div className="flex items-center bg-white/60 backdrop-blur-md px-3 py-2 rounded-xl border border-gray-100 shadow-sm flex-1 sm:flex-initial">
                                 <select
                                     value={filterSemester}
                                     onChange={e => setFilterSemester(e.target.value)}
-                                    className="bg-transparent text-xs font-semibold outline-none text-gray-600 cursor-pointer"
+                                    className="bg-transparent text-xs font-semibold outline-none text-gray-600 cursor-pointer w-full"
                                 >
                                     <option value="All">All Semesters</option>
                                     {SEMESTERS.map(s => <option key={s} value={s}>Sem {s}</option>)}
@@ -256,7 +257,7 @@ function AttendanceContent() {
                             {(filterCourse !== 'All' || filterSemester !== 'All') && (
                                 <button
                                     onClick={clearFilters}
-                                    className="text-xs font-bold text-red-500 hover:text-red-600 px-2 transition-colors uppercase tracking-tight shrink-0"
+                                    className="text-xs font-bold text-red-500 hover:text-red-600 px-2 transition-colors uppercase tracking-tight shrink-0 ml-auto"
                                 >
                                     Clear
                                 </button>
@@ -329,7 +330,7 @@ function AttendanceContent() {
                     {/* Student attendance table */}
                     <div className="card overflow-hidden">
                         <div className="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
-                            <table className="w-full text-sm border-separate border-spacing-0">
+                            <table className="w-full text-sm border-separate border-spacing-0 min-w-[800px]">
                                 <thead>
                                     <tr className="bg-blue-900 text-white sticky top-0 z-10">
                                         <th className="px-4 py-3 text-left font-semibold">#</th>
@@ -342,7 +343,9 @@ function AttendanceContent() {
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 bg-white">
                                     {loading ? (
-                                        <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400">Loading student list...</td></tr>
+                                        Array.from({ length: 10 }).map((_, i) => (
+                                            <TableRowSkeleton key={i} cols={6} />
+                                        ))
                                     ) : displayRows.length === 0 ? (
                                         <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400 italic">No students match the criteria.</td></tr>
                                     ) : displayRows.map((r, i) => (

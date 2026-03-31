@@ -15,6 +15,7 @@ import {
   ArrowRightIcon,
   ChartBarIcon,
 } from '@heroicons/react/24/outline';
+import { Skeleton } from '@/components/Skeleton';
 
 export default function HomePage() {
   const [studentCount, setStudentCount] = useState<number | null>(null);
@@ -92,9 +93,9 @@ export default function HomePage() {
             </div>
             <div>
               <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Students</p>
-              <p className="text-2xl font-bold text-blue-900">
-                {loading ? '—' : (studentCount ?? 0)}
-              </p>
+              <div className="text-2xl font-bold text-blue-900 mt-1">
+                {loading ? <Skeleton className="h-8 w-12" /> : (studentCount ?? 0)}
+              </div>
             </div>
           </div>
         </div>
@@ -106,9 +107,9 @@ export default function HomePage() {
             </div>
             <div>
               <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Total Events</p>
-              <p className="text-2xl font-bold text-blue-900">
-                {loading ? '—' : events.length}
-              </p>
+              <div className="text-2xl font-bold text-blue-900 mt-1">
+                {loading ? <Skeleton className="h-8 w-8" /> : events.length}
+              </div>
             </div>
           </div>
         </div>
@@ -120,9 +121,9 @@ export default function HomePage() {
             </div>
             <div>
               <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Avg. Attendance</p>
-              <p className="text-2xl font-bold text-blue-900">
-                {loading ? '—' : `${avgAttendance?.toFixed(1)}%`}
-              </p>
+              <div className="text-2xl font-bold text-blue-900 mt-1">
+                {loading ? <Skeleton className="h-8 w-16" /> : `${avgAttendance?.toFixed(1)}%`}
+              </div>
             </div>
           </div>
         </div>
@@ -181,7 +182,20 @@ export default function HomePage() {
         </div>
 
         {loading ? (
-          <p className="text-sm text-gray-400">Loading...</p>
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="flex items-center justify-between py-3">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="h-4 w-6" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
+                </div>
+                <Skeleton className="h-4 w-20" />
+              </div>
+            ))}
+          </div>
         ) : recentEvents.length === 0 ? (
           <p className="text-sm text-gray-400">No events yet. <Link href="/events?new=1" className="text-blue-600 hover:underline">Create one →</Link></p>
         ) : (

@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full" data-scroll-behavior="smooth">
       <body className="min-h-full flex flex-col bg-[#f4f6fb]">
-        <div className="flex flex-1 min-h-screen">
+        <div className="flex flex-col md:flex-row flex-1 min-h-screen">
           <Sidebar />
           <div className="flex flex-col flex-1 min-w-0">
             {/* Page header bar */}

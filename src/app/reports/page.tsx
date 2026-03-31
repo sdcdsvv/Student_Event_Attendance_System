@@ -13,6 +13,7 @@ import {
     ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
 import { Suspense } from 'react';
+import { TableRowSkeleton, Skeleton } from '@/components/Skeleton';
 
 const COURSES: Course[] = ['BCA', 'BIT', 'MCA'];
 const SEMESTERS = [1, 2, 3, 4, 5, 6];
@@ -146,12 +147,12 @@ function ReportsContent() {
                 </button>
             </div>
 
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="card p-6 border-l-4 border-l-blue-600">
                     <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Avg. Department Attendance</p>
                     <div className="flex items-baseline gap-2 mt-2">
-                        <p className="text-4xl font-black text-blue-900">{globalStats.avg.toFixed(1)}%</p>
+                        {loading ? <Skeleton className="h-10 w-24" /> : <p className="text-4xl font-black text-blue-900">{globalStats.avg.toFixed(1)}%</p>}
                         <span className="text-xs text-blue-500 font-bold">(Applicable)</span>
                     </div>
                     <div className="w-full bg-gray-100 h-2 rounded-full mt-4 overflow-hidden">
@@ -163,12 +164,12 @@ function ReportsContent() {
                 </div>
                 <div className="card p-6 border-l-4 border-l-green-600">
                     <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Total Active Events</p>
-                    <p className="text-4xl font-black text-blue-900 mt-2">{totalEvents}</p>
+                    {loading ? <Skeleton className="h-10 w-16 mt-2" /> : <p className="text-4xl font-black text-blue-900 mt-2">{totalEvents}</p>}
                     <p className="text-[11px] text-gray-500 mt-1 font-semibold">Tracked in system</p>
                 </div>
                 <div className="card p-6 border-l-4 border-l-amber-500">
                     <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest">Students Monitored</p>
-                    <p className="text-4xl font-black text-blue-900 mt-2">{filteredStudents.length}</p>
+                    {loading ? <Skeleton className="h-10 w-16 mt-2" /> : <p className="text-4xl font-black text-blue-900 mt-2">{filteredStudents.length}</p>}
                     <p className="text-[11px] text-gray-500 mt-1 font-semibold">Active in current view</p>
                 </div>
             </div>
@@ -217,8 +218,8 @@ function ReportsContent() {
 
             {/* Table */}
             <div className="card overflow-hidden shadow-xl border-t-0">
-                <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
-                    <table className="w-full text-sm border-separate border-spacing-0">
+                <div className="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
+                    <table className="w-full text-sm border-separate border-spacing-0 min-w-[900px]">
                         <thead className="sticky top-0 z-10 shadow-sm">
                             <tr className="bg-blue-900 text-white">
                                 <th className="px-4 py-4 text-left font-black text-xs uppercase tracking-widest border-b border-blue-800">#</th>
@@ -235,9 +236,11 @@ function ReportsContent() {
                         </thead>
                         <tbody className="divide-y divide-gray-50 bg-white">
                             {loading ? (
-                                <tr><td colSpan={8} className="px-4 py-16 text-center text-gray-400 font-medium">Analyzing attendance data...</td></tr>
+                                Array.from({ length: 10 }).map((_, i) => (
+                                    <TableRowSkeleton key={i} cols={10} />
+                                ))
                             ) : filteredStudents.length === 0 ? (
-                                <tr><td colSpan={8} className="px-4 py-16 text-center text-gray-400 font-medium italic">No students found matching your criteria.</td></tr>
+                                <tr><td colSpan={10} className="px-4 py-16 text-center text-gray-400 font-medium italic">No students found matching your criteria.</td></tr>
                             ) : filteredStudents.map((s, i) => {
                                 const stats = studentStats[s.scholar_id] || { present: 0, na: 0, absent: 0 };
                                 const possible = Math.max(0, totalEvents - stats.na);
