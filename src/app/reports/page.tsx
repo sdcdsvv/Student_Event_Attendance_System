@@ -91,9 +91,9 @@ function ReportsContent() {
 
         filteredStudents.forEach(s => {
             const stats = studentStats[s.scholar_id] || { present: 0, na: 0, absent: 0 };
-            const applicableForThisStudent = totalEvents - stats.na;
+            const applicableForThisStudent = stats.present + stats.absent;
             totalPresent += stats.present;
-            totalApplicable += Math.max(0, applicableForThisStudent);
+            totalApplicable += applicableForThisStudent;
         });
 
         return {
@@ -105,7 +105,7 @@ function ReportsContent() {
         const headers = ['S.No.', 'Scholar ID', 'Name', 'Course', 'Semester', 'Present', 'Absent', 'NA', 'Possible', 'Percentage'];
         const rows = filteredStudents.map((s, i) => {
             const stats = studentStats[s.scholar_id] || { present: 0, na: 0, absent: 0 };
-            const possible = Math.max(0, totalEvents - stats.na);
+            const possible = stats.present + stats.absent;
             const percent = possible > 0 ? ((stats.present / possible) * 100).toFixed(1) : '–';
 
             return [
@@ -243,7 +243,7 @@ function ReportsContent() {
                                 <tr><td colSpan={10} className="px-4 py-16 text-center text-gray-400 font-medium italic">No students found matching your criteria.</td></tr>
                             ) : filteredStudents.map((s, i) => {
                                 const stats = studentStats[s.scholar_id] || { present: 0, na: 0, absent: 0 };
-                                const possible = Math.max(0, totalEvents - stats.na);
+                                const possible = stats.present + stats.absent;
                                 const percentage = possible > 0 ? (stats.present / possible) * 100 : 0;
 
                                 return (

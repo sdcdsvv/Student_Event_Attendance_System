@@ -39,9 +39,23 @@ export async function getAttendanceReport(event_id: string) {
 }
 
 export async function getAllAttendance(): Promise<AttendanceRecord[]> {
-    const { data, error } = await supabase
-        .from('attendance')
-        .select('scholar_id, event_id, status');
-    if (error) throw error;
-    return data ?? [];
+    let allData: AttendanceRecord[] = [];
+    let from = 0;
+    const step = 1000;
+
+    while (true) {
+        const { data, error } = await supabase
+            .from('attendance')
+            .select('scholar_id, event_id, status')
+            .range(from, from + step - 1);
+
+        if (error) throw error;
+        if (!data || data.length === 0) break;
+
+        allData = [...allData, ...data];
+        if (data.length < step) break;
+        from += step;
+    }
+
+    return allData;
 }
