@@ -8,8 +8,10 @@ import {
     ClipboardDocumentCheckIcon,
     Bars3Icon,
     XMarkIcon,
+    ArrowLeftOnRectangleIcon,
 } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const navItems = [
     { href: '/', label: 'Dashboard', icon: HomeIcon },
@@ -21,7 +23,13 @@ const navItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    const handleLogout = () => {
+        localStorage.removeItem('dsvv_auth');
+        router.push('/login');
+    };
 
     const NavLinks = () => (
         <nav className="flex flex-col gap-1 mt-6">
@@ -58,6 +66,20 @@ export default function Sidebar() {
                 </div>
                 <div className="border-b border-blue-700/50 mb-2" />
                 <NavLinks />
+                <div className="mt-auto px-2">
+                    <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-red-300 hover:bg-red-900/30 hover:text-red-200 transition-colors"
+                    >
+                        <ArrowLeftOnRectangleIcon className="w-5 h-5 shrink-0" />
+                        Logout
+                    </button>
+                    <div className="mt-4 pt-4 border-t border-blue-700/30 text-center">
+                         <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest">
+                            Powered by SDC
+                        </p>
+                    </div>
+                </div>
             </aside>
 
             {/* Mobile Navbar */}
@@ -111,7 +133,14 @@ export default function Sidebar() {
 
                     <NavLinks />
 
-                    <div className="mt-auto pt-6 border-t border-blue-800">
+                    <div className="mt-auto pt-6 border-t border-blue-800 space-y-4">
+                        <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-red-300 hover:bg-red-900/30"
+                        >
+                            <ArrowLeftOnRectangleIcon className="w-5 h-5 shrink-0" />
+                            Logout
+                        </button>
                         <p className="text-[8px] text-blue-400 font-bold uppercase tracking-widest text-center">
                             Powered by SDC
                         </p>
