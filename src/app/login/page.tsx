@@ -55,7 +55,7 @@ export default function LoginPage() {
                 {/* Background Image with Overlay */}
                 <div 
                     className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat transition-transform duration-10000 hover:scale-110"
-                    style={{ backgroundImage: "url('/images/campus-bg.png')" }}
+                    style={{ backgroundImage: "url('/images/campus-bg.jpg')" }}
                 />
                 <div className="absolute inset-0 z-10 bg-gradient-to-br from-blue-900/90 via-blue-900/70 to-transparent" />
                 
@@ -65,7 +65,7 @@ export default function LoginPage() {
                         <div className="mb-6 p-2 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl">
                             <img src="/dsvv-logo.png" alt="DSVV Logo" className="h-28 w-auto brightness-110" />
                         </div>
-                        <p className="text-yellow-400 font-bold tracking-[0.2em] text-xs mb-2 uppercase">Campus Broadcast Platform</p>
+                        <p className="text-yellow-400 font-bold tracking-[0.2em] text-xs mb-2 uppercase">Student Event Attendance System</p>
                         <h1 className="text-6xl font-black tracking-tighter mb-4 drop-shadow-lg">CS-Connect</h1>
                         <div className="h-1 w-16 bg-yellow-400 rounded-full mb-6 mx-auto" />
                         <div className="space-y-1">
@@ -74,19 +74,20 @@ export default function LoginPage() {
                         </div>
                     </div>
 
-                    <div className="mt-auto space-y-6 max-w-md mx-auto">
-                        <div className="grid grid-cols-1 gap-4">
+                    <div className="mt-auto space-y-4 max-w-sm mx-auto">
+                        <p className="text-[10px] font-bold text-yellow-400 uppercase tracking-widest pl-1 text-center">Key Features</p>
+                        <div className="grid grid-cols-1 gap-3">
                             {[
-                                "Instant Campus Broadcasts",
-                                "Targeted Audience Messaging",
-                                "Delivery & Engagement Analytics",
-                                "Scheduled Message Planner"
+                                "Comprehensive Student Database",
+                                "One-Tap Attendance Marking",
+                                "Dynamic Event Reports",
+                                "Offline Data Persistence"
                             ].map((feature, i) => (
-                                <div key={i} className="flex items-center gap-4 bg-white/5 hover:bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10 transition-all cursor-default group">
-                                    <div className="p-2 bg-yellow-400/20 text-yellow-400 rounded-lg group-hover:bg-yellow-400 group-hover:text-blue-900 transition-colors">
-                                        <CheckCircleIcon className="w-5 h-5" />
+                                <div key={i} className="flex items-center gap-3 bg-white/5 backdrop-blur-sm p-3 rounded-xl border border-white/10 transition-all cursor-default group hover:bg-white/10">
+                                    <div className="p-1.5 bg-yellow-400/20 text-yellow-400 rounded-lg group-hover:bg-yellow-400 group-hover:text-blue-900 transition-colors shrink-0">
+                                        <CheckCircleIcon className="w-4 h-4" />
                                     </div>
-                                    <span className="text-sm font-medium tracking-wide">{feature}</span>
+                                    <span className="text-xs font-semibold tracking-wide">{feature}</span>
                                 </div>
                             ))}
                         </div>
@@ -184,7 +185,7 @@ export default function LoginPage() {
                     <div className="mt-12 pt-8 border-t border-slate-100 text-center space-y-4">
                         <div className="space-y-1">
                             <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Department of Computer Science</p>
-                            <p className="text-xs font-semibold text-slate-600">CS-Connect &mdash; Campus Broadcast Platform</p>
+                            <p className="text-xs font-semibold text-slate-600">CS-Connect &mdash; Event Attendance System</p>
                         </div>
                         <div className="pt-2">
                             <p className="text-[9px] text-slate-400 font-bold uppercase tracking-[0.1em]">Powered by:</p>

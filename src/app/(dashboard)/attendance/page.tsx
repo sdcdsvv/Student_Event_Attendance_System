@@ -334,11 +334,11 @@ function AttendanceContent() {
                                 <thead>
                                     <tr className="bg-blue-900 text-white sticky top-0 z-10">
                                         <th className="px-4 py-3 text-left font-semibold">#</th>
-                                        <th className="px-4 py-3 text-left font-semibold">Scholar ID</th>
+                                        <th className="px-4 py-3 text-center font-semibold">Status</th>
                                         <th className="px-4 py-3 text-left font-semibold">Name</th>
+                                        <th className="px-4 py-3 text-left font-semibold">Scholar ID</th>
                                         <th className="px-4 py-3 text-left font-semibold">Course</th>
                                         <th className="px-4 py-3 text-left font-semibold">Sem</th>
-                                        <th className="px-4 py-3 text-center font-semibold">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 bg-white">
@@ -361,16 +361,6 @@ function AttendanceContent() {
                                                 }`}
                                         >
                                             <td className="px-4 py-3 text-gray-400 text-xs">{i + 1}</td>
-                                            <td className="px-4 py-3 font-mono text-xs text-blue-900 font-semibold">{r.student.scholar_id}</td>
-                                            <td className="px-4 py-3 font-medium text-gray-800">{r.student.name}</td>
-                                            <td className="px-4 py-3">
-                                                <span className={`stat-badge border ${getCourseColor(r.student.course)} text-[10px] font-bold`}>{r.student.course}</span>
-                                            </td>
-                                            <td className="px-4 py-3 text-center">
-                                                <span className={`px-2 py-0.5 rounded-md text-[10px] border shadow-sm ${getSemesterColor(r.student.semester)}`}>
-                                                    Sem {r.student.semester}
-                                                </span>
-                                            </td>
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center justify-center gap-1.5">
                                                     <button
@@ -395,6 +385,16 @@ function AttendanceContent() {
                                                         <NoSymbolIcon className="w-5 h-5" />
                                                     </button>
                                                 </div>
+                                            </td>
+                                            <td className="px-4 py-3 font-medium text-gray-800">{r.student.name}</td>
+                                            <td className="px-4 py-3 font-mono text-xs text-blue-900 font-semibold">{r.student.scholar_id}</td>
+                                            <td className="px-4 py-3">
+                                                <span className={`stat-badge border ${getCourseColor(r.student.course)} text-[10px] font-bold`}>{r.student.course}</span>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                <span className={`px-2 py-0.5 rounded-md text-[10px] border shadow-sm ${getSemesterColor(r.student.semester)}`}>
+                                                    Sem {r.student.semester}
+                                                </span>
                                             </td>
                                         </tr>
                                     ))}
