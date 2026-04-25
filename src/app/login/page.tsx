@@ -69,7 +69,7 @@ export default function LoginPage() {
                         <img src="/dsvv-logo.png" alt="DSVV Logo" className="h-[45px] sm:h-[55px] w-auto object-contain brightness-110" />
                     </div>
 
-                    <p className="text-yellow-400 font-bold tracking-[0.1em] sm:tracking-[0.15em] text-[13px] sm:text-[17px] mb-6 sm:mb-8 uppercase drop-shadow-md px-4">Student Event Attendance System</p>
+                    <p className="text-yellow-400 font-bold tracking-[0.1em] sm:tracking-[0.12em] text-[15px] sm:text-[20px] lg:text-[24px] mb-6 sm:mb-8 uppercase drop-shadow-md px-4">Student Event Attendance System</p>
                     
                     <div className="flex flex-col items-center mt-2 sm:mt-6 px-4">
                         <p className="text-[11px] sm:text-[13px] uppercase tracking-wider font-medium text-gray-200 mb-1">Dev Sanskriti Vishwavidyalaya</p>

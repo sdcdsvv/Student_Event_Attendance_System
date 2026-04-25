@@ -10,6 +10,8 @@ export interface Student {
   semester: number;
   contact_number: string;
   email: string;
+  photo_url?: string;
+  photo_public_id?: string;
 }
 
 export interface Event {

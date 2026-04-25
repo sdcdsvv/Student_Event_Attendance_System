@@ -82,6 +82,18 @@ async function exportPDF(
         headStyles: { fillColor: [30, 58, 138], textColor: 255, fontStyle: 'bold' },
         alternateRowStyles: { fillColor: [245, 247, 255] },
         margin: { left: 10, right: 10 },
+        didParseCell: function(data) {
+            if (data.section === 'body') {
+                const status = rows[data.row.index]?.status;
+                if (status === 'Present') {
+                    data.cell.styles.fillColor = [220, 252, 231]; // light green (bg-green-100)
+                } else if (status === 'Absent') {
+                    data.cell.styles.fillColor = [254, 226, 226]; // light red (bg-red-100)
+                } else if (status === 'NA') {
+                    data.cell.styles.fillColor = [254, 243, 199]; // light amber (bg-amber-100)
+                }
+            }
+        },
     });
 
     const safeName = eventName.replace(/[^a-zA-Z0-9_\- ]/g, '').replace(/\s+/g, '_');
@@ -111,6 +123,24 @@ function exportExcel(
     for (let c = range.s.c; c <= range.e.c; c++) {
         const cell = ws[XLSX.utils.encode_cell({ r: 0, c })];
         if (cell) cell.s = { font: { bold: true } };
+    }
+
+    // Apply row background colors based on status
+    for (let r = 1; r <= data.length; r++) {
+        const status = rows[r - 1]?.status;
+        let bgColor = null;
+        if (status === 'Present') bgColor = 'FFDCFCE7';     // light green
+        else if (status === 'Absent') bgColor = 'FFFEE2E2'; // light red
+        else if (status === 'NA') bgColor = 'FFFEF3C7';     // light amber
+        
+        if (bgColor) {
+            for (let c = range.s.c; c <= range.e.c; c++) {
+                const cell = ws[XLSX.utils.encode_cell({ r, c })];
+                if (cell) {
+                    cell.s = { ...cell.s, fill: { patternType: 'solid', fgColor: { rgb: bgColor } } };
+                }
+            }
+        }
     }
 
     // Column widths

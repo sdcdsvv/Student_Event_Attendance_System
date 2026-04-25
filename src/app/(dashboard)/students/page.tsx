@@ -32,6 +32,8 @@ const emptyForm: Student = {
     semester: 1,
     contact_number: '',
     email: '',
+    photo_url: '',
+    photo_public_id: '',
 };
 
 function StudentsContent() {
@@ -45,6 +47,8 @@ function StudentsContent() {
     const [saving, setSaving] = useState(false);
     const [toast, setToast] = useState<{ msg: string; type: 'success' | 'error' } | null>(null);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     // Filters State
     const [filterCourse, setFilterCourse] = useState<string>('All');
@@ -98,27 +102,66 @@ function StudentsContent() {
         e.preventDefault();
         setSaving(true);
         try {
+            let finalForm = { ...form };
+            
+            if (selectedFile) {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+                
+                const uploadRes = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                
+                if (!uploadRes.ok) {
+                    const errorData = await uploadRes.json();
+                    throw new Error(errorData.error || 'Failed to upload photo');
+                }
+                
+                const uploadData = await uploadRes.json();
+                finalForm.photo_url = uploadData.secure_url;
+                finalForm.photo_public_id = uploadData.public_id;
+                
+                // If editing and replacing an old photo, delete the old one
+                if (editMode && form.photo_public_id && form.photo_public_id !== uploadData.public_id) {
+                    await fetch('/api/delete-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ public_id: form.photo_public_id }),
+                    }).catch(console.error);
+                }
+            }
+
             if (editMode) {
-                await updateStudent(form.scholar_id, form);
+                await updateStudent(finalForm.scholar_id, finalForm);
                 showToast('Student updated successfully');
             } else {
-                await addStudent(form);
+                await addStudent(finalForm);
                 showToast('Student added successfully');
             }
             setShowModal(false);
             setForm(emptyForm);
             setEditMode(false);
+            setSelectedFile(null);
+            setPreviewUrl(null);
             load();
-        } catch (err: unknown) {
-            showToast(err instanceof Error ? err.message : 'Failed to save student', 'error');
+        } catch (err: any) {
+            showToast(err.message || 'Failed to save student', 'error');
         } finally {
             setSaving(false);
         }
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = async (id: string, s?: Student) => {
         try {
             await deleteStudent(id);
+            if (s?.photo_public_id) {
+                await fetch('/api/delete-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ public_id: s.photo_public_id }),
+                }).catch(err => console.error('Failed to delete image from cloudinary', err));
+            }
             showToast('Student deleted');
             load();
         } catch {
@@ -261,7 +304,13 @@ function StudentsContent() {
                         <input type="file" accept=".csv,.xlsx,.xls" onChange={handleImport} className="hidden" />
                     </label>
                     <button
-                        onClick={() => { setShowModal(true); setForm(emptyForm); setEditMode(false); }}
+                        onClick={() => { 
+                            setShowModal(true); 
+                            setForm(emptyForm); 
+                            setEditMode(false); 
+                            setSelectedFile(null);
+                            setPreviewUrl(null);
+                        }}
                         className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-800 transition-all shadow-md active:scale-95 whitespace-nowrap"
                     >
                         <PlusIcon className="w-4 h-4" /> Add Student
@@ -322,6 +371,7 @@ function StudentsContent() {
                         <thead className="sticky top-0 z-10 shadow-sm">
                             <tr className="bg-blue-900 text-white">
                                 <th className="px-4 py-3 text-left font-semibold">#</th>
+                                <th className="px-4 py-3 text-center font-semibold">Photo</th>
                                 <th className="px-4 py-3 text-left font-semibold">Scholar ID</th>
                                 <th className="px-4 py-3 text-left font-semibold">Name</th>
                                 <th className="px-4 py-3 text-left font-semibold">Gender</th>
@@ -335,10 +385,10 @@ function StudentsContent() {
                         <tbody className="divide-y divide-gray-100">
                             {loading ? (
                                 Array.from({ length: 5 }).map((_, i) => (
-                                    <TableRowSkeleton key={i} cols={9} />
+                                    <TableRowSkeleton key={i} cols={10} />
                                 ))
                             ) : students.length === 0 ? (
-                                <tr><td colSpan={9} className="px-4 py-8 text-center text-gray-400">
+                                <tr><td colSpan={10} className="px-4 py-8 text-center text-gray-400">
                                     {(query || filterCourse !== 'All' || filterSemester !== 'All')
                                         ? 'No students match your filters.'
                                         : 'No students yet. Add one!'}
@@ -346,6 +396,17 @@ function StudentsContent() {
                             ) : students.map((s, i) => (
                                 <tr key={s.scholar_id} className="hover:bg-gray-50/80 transition-colors">
                                     <td className="px-4 py-3 text-gray-400 text-xs border-b border-gray-50">{i + 1}</td>
+                                    <td className="px-4 py-2 border-b border-gray-50 text-center">
+                                        <div className="flex justify-center">
+                                            {s.photo_url ? (
+                                                <img src={s.photo_url} alt={s.name} className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm" />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs shadow-sm">
+                                                    {s.name.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
                                     <td className="px-4 py-3 font-mono text-xs text-blue-800 border-b border-gray-50">{s.scholar_id}</td>
                                     <td className="px-4 py-3 font-medium border-b border-gray-50">{s.name}</td>
                                     <td className="px-4 py-3 text-gray-600 border-b border-gray-50">{s.gender}</td>
@@ -362,14 +423,20 @@ function StudentsContent() {
                                     <td className="px-4 py-3 text-center border-b border-gray-50">
                                         <div className="flex items-center justify-center gap-2">
                                             <button
-                                                onClick={() => { setForm(s); setEditMode(true); setShowModal(true); }}
+                                                onClick={() => { 
+                                                    setForm(s); 
+                                                    setEditMode(true); 
+                                                    setSelectedFile(null);
+                                                    setPreviewUrl(s.photo_url || null);
+                                                    setShowModal(true); 
+                                                }}
                                                 className="text-gray-400 hover:text-blue-600 transition-colors"
                                             >
                                                 <PencilSquareIcon className="w-4 h-4" />
                                             </button>
                                             {deleteId === s.scholar_id ? (
                                                 <div className="flex justify-center gap-2">
-                                                    <button onClick={() => handleDelete(s.scholar_id)} className="text-xs text-red-600 font-semibold hover:underline">Confirm</button>
+                                                    <button onClick={() => handleDelete(s.scholar_id, s)} className="text-xs text-red-600 font-semibold hover:underline">Confirm</button>
                                                     <button onClick={() => setDeleteId(null)} className="text-xs text-gray-500 hover:underline">Cancel</button>
                                                 </div>
                                             ) : (
@@ -486,6 +553,31 @@ function StudentsContent() {
                             </button>
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                            <div className="col-span-1 sm:col-span-2 flex items-center gap-4 border-b border-gray-100 pb-4">
+                                <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-300 overflow-hidden shrink-0 flex items-center justify-center">
+                                    {previewUrl ? (
+                                        <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-gray-400 text-[10px] font-bold text-center px-2 uppercase leading-tight">No<br/>Photo</span>
+                                    )}
+                                </div>
+                                <div className="flex-1">
+                                    <label className="text-xs font-semibold text-gray-600 mb-1 block">Profile Photo (Optional)</label>
+                                    <input 
+                                        type="file" 
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                setSelectedFile(file);
+                                                setPreviewUrl(URL.createObjectURL(file));
+                                            }
+                                        }}
+                                        className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:uppercase file:tracking-wider file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors cursor-pointer text-gray-500 w-full" 
+                                    />
+                                    <p className="text-[10px] text-gray-400 mt-1">Image will be optimized and saved to Cloudinary.</p>
+                                </div>
+                            </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div>
                                     <label className="text-xs font-semibold text-gray-600 mb-1 block">Scholar ID *</label>
