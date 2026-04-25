@@ -119,6 +119,12 @@ function StudentsContent() {
                 }
                 
                 const uploadData = await uploadRes.json();
+                console.log("Cloudinary Upload Success:", uploadData);
+                
+                if (!uploadData.secure_url || !uploadData.public_id) {
+                    throw new Error('Upload returned empty url or public_id from Cloudinary.');
+                }
+
                 finalForm.photo_url = uploadData.secure_url;
                 finalForm.photo_public_id = uploadData.public_id;
                 
@@ -132,13 +138,26 @@ function StudentsContent() {
                 }
             }
 
+            console.log("FULL OBJECT BEING SENT TO SUPABASE:", JSON.stringify(finalForm, null, 2));
+            
+            let result;
             if (editMode) {
-                await updateStudent(finalForm.scholar_id, finalForm);
+                result = await updateStudent(finalForm.scholar_id, finalForm);
                 showToast('Student updated successfully');
             } else {
-                await addStudent(finalForm);
+                result = await addStudent(finalForm);
                 showToast('Student added successfully');
             }
+            
+            console.log("Supabase RETURNED Data:", JSON.stringify(result, null, 2));
+
+            if (selectedFile && !result.photo_url) {
+                console.error("CRITICAL: Result from Supabase does NOT contain photo_url. Please check if column names 'photo_url' and 'photo_public_id' are correct in your Supabase Table Editor.");
+                showToast("Database didn't save photo URL. Check table column names.", "error");
+            } else {
+                console.log("Saved successfully and verified in DB result!");
+            }
+
             setShowModal(false);
             setForm(emptyForm);
             setEditMode(false);
@@ -399,9 +418,9 @@ function StudentsContent() {
                                     <td className="px-4 py-2 border-b border-gray-50 text-center">
                                         <div className="flex justify-center">
                                             {s.photo_url ? (
-                                                <img src={s.photo_url} alt={s.name} className="w-8 h-8 rounded-full object-cover border border-gray-200 shadow-sm" />
+                                                <img src={s.photo_url} alt={s.name} className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 shadow-sm transition-transform hover:scale-150 relative z-10" />
                                             ) : (
-                                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-xs shadow-sm">
+                                                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg shadow-sm">
                                                     {s.name.charAt(0).toUpperCase()}
                                                 </div>
                                             )}

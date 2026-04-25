@@ -335,6 +335,7 @@ function AttendanceContent() {
                                     <tr className="bg-blue-900 text-white sticky top-0 z-10">
                                         <th className="px-4 py-3 text-left font-semibold">#</th>
                                         <th className="px-4 py-3 text-center font-semibold">Status</th>
+                                        <th className="px-4 py-3 text-center font-semibold">Photo</th>
                                         <th className="px-4 py-3 text-left font-semibold">Name</th>
                                         <th className="px-4 py-3 text-left font-semibold">Scholar ID</th>
                                         <th className="px-4 py-3 text-left font-semibold">Course</th>
@@ -344,10 +345,10 @@ function AttendanceContent() {
                                 <tbody className="divide-y divide-gray-100 bg-white">
                                     {loading ? (
                                         Array.from({ length: 10 }).map((_, i) => (
-                                            <TableRowSkeleton key={i} cols={6} />
+                                            <TableRowSkeleton key={i} cols={7} />
                                         ))
                                     ) : displayRows.length === 0 ? (
-                                        <tr><td colSpan={6} className="px-4 py-12 text-center text-gray-400 italic">No students match the criteria.</td></tr>
+                                        <tr><td colSpan={7} className="px-4 py-12 text-center text-gray-400 italic">No students match the criteria.</td></tr>
                                     ) : displayRows.map((r, i) => (
                                         <tr
                                             key={r.student.scholar_id}
@@ -386,8 +387,19 @@ function AttendanceContent() {
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 font-medium text-gray-800">{r.student.name}</td>
-                                            <td className="px-4 py-3 font-mono text-xs text-blue-900 font-semibold">{r.student.scholar_id}</td>
+                                            <td className="px-4 py-2 border-b border-gray-50 text-center">
+                                                <div className="flex justify-center">
+                                                    {r.student.photo_url ? (
+                                                        <img src={r.student.photo_url} alt={r.student.name} className="w-16 h-16 rounded-full object-cover border-2 border-gray-200 shadow-sm transition-transform hover:scale-150" />
+                                                    ) : (
+                                                        <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-black text-2xl shadow-sm">
+                                                            {r.student.name.charAt(0).toUpperCase()}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 font-bold text-gray-800 text-base">{r.student.name}</td>
+                                            <td className="px-4 py-3 font-mono text-sm text-blue-900 font-semibold">{r.student.scholar_id}</td>
                                             <td className="px-4 py-3">
                                                 <span className={`stat-badge border ${getCourseColor(r.student.course)} text-[10px] font-bold`}>{r.student.course}</span>
                                             </td>
