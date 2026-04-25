@@ -25,15 +25,30 @@ export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [role, setRole] = useState<string | null>(null);
+
+    useState(() => {
+        if (typeof window !== 'undefined') {
+            setRole(localStorage.getItem('dsvv_role'));
+        }
+    });
 
     const handleLogout = () => {
         localStorage.removeItem('dsvv_auth');
+        localStorage.removeItem('dsvv_role');
         router.push('/login');
     };
 
+    const filteredNavItems = navItems.filter(item => {
+        if (role === 'user') {
+            return item.href === '/' || item.href === '/attendance';
+        }
+        return true;
+    });
+
     const NavLinks = () => (
         <nav className="flex flex-col gap-1 mt-6">
-            {navItems.map(({ href, label, icon: Icon }) => {
+            {filteredNavItems.map(({ href, label, icon: Icon }) => {
                 const active = pathname === href;
                 return (
                     <Link

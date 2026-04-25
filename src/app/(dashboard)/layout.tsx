@@ -15,10 +15,19 @@ export default function DashboardLayout({
 
   useEffect(() => {
     const auth = localStorage.getItem('dsvv_auth');
+    const role = localStorage.getItem('dsvv_role');
+    const pathname = window.location.pathname;
+
     if (auth !== 'true') {
       router.push('/login');
     } else {
-      setIsAuthorized(true);
+      // Protect Admin Routes
+      const adminOnlyRoutes = ['/students', '/events', '/reports'];
+      if (role === 'user' && adminOnlyRoutes.some(route => pathname.startsWith(route))) {
+        router.push('/');
+      } else {
+        setIsAuthorized(true);
+      }
     }
   }, [router]);
 

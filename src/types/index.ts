@@ -19,6 +19,7 @@ export interface Event {
   event_name: string;
   event_date: string;
   event_time?: string | null;
+  is_active?: boolean;
 }
 
 export interface Attendance {

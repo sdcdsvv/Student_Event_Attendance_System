@@ -24,8 +24,15 @@ export default function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
 
     // Hardcoded credentials
-    const VALID_EMAIL = 'sdc@dsvv.ac.in';
-    const VALID_PASSWORD = 'SdcDsvv@2027';
+    const ADMIN_CREDENTIALS = {
+        email: 'sdc@dsvv.ac.in',
+        password: 'SdcDsvv@2027'
+    };
+
+    const USER_CREDENTIALS = {
+        email: 'sdc@gmail.com',
+        password: 'sdc@123'
+    };
 
     useEffect(() => {
         // Check if already logged in
@@ -43,8 +50,13 @@ export default function LoginPage() {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 800));
 
-        if (email === VALID_EMAIL && password === VALID_PASSWORD) {
+        if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
             localStorage.setItem('dsvv_auth', 'true');
+            localStorage.setItem('dsvv_role', 'admin');
+            router.push('/dashboard');
+        } else if (email === USER_CREDENTIALS.email && password === USER_CREDENTIALS.password) {
+            localStorage.setItem('dsvv_auth', 'true');
+            localStorage.setItem('dsvv_role', 'user');
             router.push('/dashboard');
         } else {
             setError('Invalid email or password. Please try again.');

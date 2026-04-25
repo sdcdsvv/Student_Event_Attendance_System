@@ -20,7 +20,7 @@ import {
 import { Suspense } from 'react';
 import { TableRowSkeleton } from '@/components/Skeleton';
 
-const emptyForm = { event_name: '', event_date: '', event_time: '' };
+const emptyForm = { event_name: '', event_date: '', event_time: '', is_active: true };
 
 function EventsContent() {
     const router = useRouter();
@@ -82,6 +82,7 @@ function EventsContent() {
                 event_name: form.event_name,
                 event_date: form.event_date,
                 event_time: form.event_time || null,
+                is_active: form.is_active,
             };
 
             if (editMode && editId) {
@@ -284,6 +285,7 @@ function EventsContent() {
                                 <th className="px-4 py-3 text-left font-semibold">Event Name</th>
                                 <th className="px-4 py-3 text-left font-semibold">Date</th>
                                 <th className="px-4 py-3 text-left font-semibold">Time</th>
+                                <th className="px-4 py-3 text-center font-semibold">Attendance Status</th>
                                 <th className="px-4 py-3 text-left font-semibold">Progress</th>
                                 <th className="px-4 py-3 text-center font-semibold">Actions</th>
                             </tr>
@@ -304,6 +306,26 @@ function EventsContent() {
                                         {ev.event_time
                                             ? new Date(`1970-01-01T${ev.event_time}`).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
                                             : <span className="text-gray-300">—</span>}
+                                    </td>
+                                    <td className="px-4 py-3 text-center">
+                                        <button
+                                            onClick={async () => {
+                                                try {
+                                                    await updateEvent(ev.event_id, { is_active: !ev.is_active });
+                                                    load();
+                                                    showToast(`Attendance ${!ev.is_active ? 'Opened' : 'Closed'} for ${ev.event_name}`);
+                                                } catch {
+                                                    showToast('Failed to update status', 'error');
+                                                }
+                                            }}
+                                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider transition-colors shadow-sm border ${
+                                                ev.is_active 
+                                                ? 'bg-green-100 text-green-700 border-green-200 hover:bg-green-200' 
+                                                : 'bg-red-100 text-red-700 border-red-200 hover:bg-red-200'
+                                            }`}
+                                        >
+                                            {ev.is_active ? '● Open' : '○ Closed'}
+                                        </button>
                                     </td>
                                     <td className="px-4 py-3">
                                         {stats[ev.event_id] ? (
@@ -338,7 +360,8 @@ function EventsContent() {
                                                     setForm({
                                                         event_name: ev.event_name,
                                                         event_date: ev.event_date,
-                                                        event_time: ev.event_time || ''
+                                                        event_time: ev.event_time || '',
+                                                        is_active: ev.is_active ?? true
                                                     });
                                                     setEditMode(true);
                                                     setEditId(ev.event_id);
@@ -492,6 +515,21 @@ function EventsContent() {
                                         className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
                                 </div>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-bold text-blue-900">Allow Attendance</p>
+                                    <p className="text-[10px] text-gray-500">Enable or disable attendance marking for this event</p>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setForm(p => ({ ...p, is_active: !p.is_active }))}
+                                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${form.is_active ? 'bg-blue-600' : 'bg-gray-300'}`}
+                                >
+                                    <span
+                                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.is_active ? 'translate-x-6' : 'translate-x-1'}`}
+                                    />
+                                </button>
                             </div>
                             <div className="flex justify-end gap-3 pt-2">
                                 <button

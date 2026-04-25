@@ -51,10 +51,10 @@ function AttendanceContent() {
     const [exportCols, setExportCols] = useState<string[]>(ALL_EXPORT_COLS.map(c => c.key));
     const [saved, setSaved] = useState(false);
 
-    // Filters state
     const [filterCourse, setFilterCourse] = useState<string>('All');
     const [filterSemester, setFilterSemester] = useState<string>('All');
     const [searchQuery, setSearchQuery] = useState('');
+    const [role, setRole] = useState<string | null>(null);
 
     const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
         setToast({ msg, type });
@@ -62,8 +62,14 @@ function AttendanceContent() {
     };
 
     useEffect(() => {
+        if (typeof window !== 'undefined') {
+            setRole(localStorage.getItem('dsvv_role'));
+        }
         getEvents().then(setEvents).catch(() => showToast('Failed to load events', 'error'));
     }, []);
+
+    const selectedEvent = events.find(e => e.event_id === selectedEventId);
+    const canEdit = role === 'admin' || (selectedEvent?.is_active ?? true);
 
     const loadAttendance = useCallback(async (eventId: string) => {
         if (!eventId) return;
@@ -211,6 +217,12 @@ function AttendanceContent() {
 
             {selectedEventId && rows.length > 0 && (
                 <>
+                    {!canEdit && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-center gap-3">
+                            <NoSymbolIcon className="w-5 h-5 flex-shrink-0" />
+                            <p className="font-medium">Attendance is currently **CLOSED** for this event. You can only view the records.</p>
+                        </div>
+                    )}
                     <div className="flex flex-col md:flex-row gap-3">
                         <div className="flex flex-wrap gap-2 items-center flex-1">
                             <div className="w-full md:flex-1 md:min-w-[200px]">
@@ -286,24 +298,28 @@ function AttendanceContent() {
 
                     {/* Bulk actions + save */}
                     <div className="flex flex-wrap items-center gap-3">
-                        <button
-                            onClick={() => markAll('Present')}
-                            className="flex items-center gap-1.5 text-[11px] bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-green-700 transition-colors uppercase tracking-tight"
-                        >
-                            <CheckCircleIcon className="w-3.5 h-3.5" /> All Present
-                        </button>
-                        <button
-                            onClick={() => markAll('Absent')}
-                            className="flex items-center gap-1.5 text-[11px] bg-red-500 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-red-600 transition-colors uppercase tracking-tight"
-                        >
-                            <XCircleIcon className="w-3.5 h-3.5" /> All Absent
-                        </button>
-                        <button
-                            onClick={() => markAll('NA')}
-                            className="flex items-center gap-1.5 text-[11px] bg-amber-500 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600 transition-colors uppercase tracking-tight"
-                        >
-                            <NoSymbolIcon className="w-3.5 h-3.5" /> All NA
-                        </button>
+                        {canEdit && (
+                            <>
+                                <button
+                                    onClick={() => markAll('Present')}
+                                    className="flex items-center gap-1.5 text-[11px] bg-green-600 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-green-700 transition-colors uppercase tracking-tight"
+                                >
+                                    <CheckCircleIcon className="w-3.5 h-3.5" /> All Present
+                                </button>
+                                <button
+                                    onClick={() => markAll('Absent')}
+                                    className="flex items-center gap-1.5 text-[11px] bg-red-500 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-red-600 transition-colors uppercase tracking-tight"
+                                >
+                                    <XCircleIcon className="w-3.5 h-3.5" /> All Absent
+                                </button>
+                                <button
+                                    onClick={() => markAll('NA')}
+                                    className="flex items-center gap-1.5 text-[11px] bg-amber-500 text-white px-3 py-1.5 rounded-lg font-bold hover:bg-amber-600 transition-colors uppercase tracking-tight"
+                                >
+                                    <NoSymbolIcon className="w-3.5 h-3.5" /> All NA
+                                </button>
+                            </>
+                        )}
                         <div className="flex-1" />
                         {saved && (
                             <button
@@ -313,18 +329,20 @@ function AttendanceContent() {
                                 <ArrowDownTrayIcon className="w-3.5 h-3.5" /> Export
                             </button>
                         )}
-                        <button
-                            onClick={handleSave}
-                            disabled={saving}
-                            className="flex items-center gap-2 bg-blue-700 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-800 shadow-md transition-all active:scale-95 disabled:opacity-50"
-                        >
-                            {saving ? (
-                                <>
-                                    <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-                                    Saving...
-                                </>
-                            ) : 'Save Attendance'}
-                        </button>
+                        {canEdit && (
+                            <button
+                                onClick={handleSave}
+                                disabled={saving}
+                                className="flex items-center gap-2 bg-blue-700 text-white px-5 py-2 rounded-xl text-sm font-bold hover:bg-blue-800 shadow-md transition-all active:scale-95 disabled:opacity-50"
+                            >
+                                {saving ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : 'Save Attendance'}
+                            </button>
+                        )}
                     </div>
 
                     {/* Student attendance table */}
@@ -363,24 +381,27 @@ function AttendanceContent() {
                                         >
                                             <td className="px-4 py-3 text-gray-400 text-xs">{i + 1}</td>
                                             <td className="px-4 py-3">
-                                                <div className="flex items-center justify-center gap-1.5">
+                                                <div className={`flex items-center justify-center gap-1.5 ${!canEdit ? 'opacity-60 cursor-not-allowed' : ''}`}>
                                                     <button
+                                                        disabled={!canEdit}
                                                         onClick={() => setRows(prev => prev.map(row => row.student.scholar_id === r.student.scholar_id ? { ...row, status: 'Present' } : row))}
-                                                        className={`p-1.5 rounded-lg transition-all ${r.status === 'Present' ? 'bg-green-600 text-white shadow-sm scale-110' : 'bg-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-600'}`}
+                                                        className={`p-1.5 rounded-lg transition-all ${r.status === 'Present' ? 'bg-green-600 text-white shadow-sm scale-110' : 'bg-gray-100 text-gray-400 hover:bg-green-50 hover:text-green-600'} ${!canEdit ? 'pointer-events-none' : ''}`}
                                                         title="Present"
                                                     >
                                                         <CheckCircleIcon className="w-5 h-5" />
                                                     </button>
                                                     <button
+                                                        disabled={!canEdit}
                                                         onClick={() => setRows(prev => prev.map(row => row.student.scholar_id === r.student.scholar_id ? { ...row, status: 'Absent' } : row))}
-                                                        className={`p-1.5 rounded-lg transition-all ${r.status === 'Absent' ? 'bg-red-500 text-white shadow-sm scale-110' : 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500'}`}
+                                                        className={`p-1.5 rounded-lg transition-all ${r.status === 'Absent' ? 'bg-red-500 text-white shadow-sm scale-110' : 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-500'} ${!canEdit ? 'pointer-events-none' : ''}`}
                                                         title="Absent"
                                                     >
                                                         <XCircleIcon className="w-5 h-5" />
                                                     </button>
                                                     <button
+                                                        disabled={!canEdit}
                                                         onClick={() => setRows(prev => prev.map(row => row.student.scholar_id === r.student.scholar_id ? { ...row, status: 'NA' } : row))}
-                                                        className={`p-1.5 rounded-lg transition-all ${r.status === 'NA' ? 'bg-amber-500 text-white shadow-sm scale-110' : 'bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-600'}`}
+                                                        className={`p-1.5 rounded-lg transition-all ${r.status === 'NA' ? 'bg-amber-500 text-white shadow-sm scale-110' : 'bg-gray-100 text-gray-400 hover:bg-amber-50 hover:text-amber-600'} ${!canEdit ? 'pointer-events-none' : ''}`}
                                                         title="Not Applicable"
                                                     >
                                                         <NoSymbolIcon className="w-5 h-5" />

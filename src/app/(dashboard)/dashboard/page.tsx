@@ -24,6 +24,13 @@ export default function HomePage() {
   const [eventStats, setEventStats] = useState<Record<string, { present: number; total: number; na: number }>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setRole(localStorage.getItem('dsvv_role'));
+    }
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -148,20 +155,24 @@ export default function HomePage() {
       <div className="card p-5">
         <h3 className="font-semibold text-blue-900 mb-3">Quick Actions</h3>
         <div className="flex flex-wrap gap-3">
-          <Link
-            href="/events?new=1"
-            className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
-          >
-            <PlusCircleIcon className="w-4 h-4" />
-            New Event
-          </Link>
-          <Link
-            href="/students?new=1"
-            className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
-          >
-            <PlusCircleIcon className="w-4 h-4" />
-            Add Student
-          </Link>
+          {role === 'admin' && (
+            <>
+              <Link
+                href="/events?new=1"
+                className="flex items-center gap-2 bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 transition-colors"
+              >
+                <PlusCircleIcon className="w-4 h-4" />
+                New Event
+              </Link>
+              <Link
+                href="/students?new=1"
+                className="flex items-center gap-2 bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors"
+              >
+                <PlusCircleIcon className="w-4 h-4" />
+                Add Student
+              </Link>
+            </>
+          )}
           <Link
             href="/attendance"
             className="flex items-center gap-2 bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
