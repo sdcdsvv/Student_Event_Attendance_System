@@ -350,7 +350,7 @@ function AttendanceContent() {
                         <div className="overflow-x-auto max-h-[600px] overflow-y-auto custom-scrollbar">
                             <table className="w-full text-sm border-separate border-spacing-0 min-w-[800px]">
                                 <thead>
-                                    <tr className="bg-blue-900 text-white sticky top-0 z-10">
+                                    <tr className="bg-blue-900 text-white sticky top-0 z-20">
                                         <th className="px-4 py-3 text-left font-semibold">#</th>
                                         <th className="px-4 py-3 text-center font-semibold">Status</th>
                                         <th className="px-4 py-3 text-center font-semibold">Photo</th>

@@ -387,7 +387,7 @@ function StudentsContent() {
             <div className="card overflow-hidden">
                 <div className="overflow-x-auto max-h-[500px] overflow-y-auto custom-scrollbar">
                     <table className="w-full text-sm border-separate border-spacing-0 min-w-[1000px]">
-                        <thead className="sticky top-0 z-10 shadow-sm">
+                        <thead className="sticky top-0 z-20 shadow-sm">
                             <tr className="bg-blue-900 text-white">
                                 <th className="px-4 py-3 text-left font-semibold">#</th>
                                 <th className="px-4 py-3 text-center font-semibold">Photo</th>
@@ -418,7 +418,7 @@ function StudentsContent() {
                                     <td className="px-4 py-2 border-b border-gray-50 text-center">
                                         <div className="flex justify-center">
                                             {s.photo_url ? (
-                                                <img src={s.photo_url} alt={s.name} className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 shadow-sm transition-transform hover:scale-150 relative z-10" />
+                                                <img src={s.photo_url} alt={s.name} className="w-12 h-12 rounded-full object-cover border-2 border-gray-200 shadow-sm transition-transform hover:scale-150 relative" />
                                             ) : (
                                                 <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg shadow-sm">
                                                     {s.name.charAt(0).toUpperCase()}
